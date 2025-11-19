@@ -26,7 +26,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGc...
 
 Open PowerShell in: `C:\xampp1\htdocs\pos_system_dark`
 
-```powershell
+```powershellf
 # If first time:
 git init
 git add .
