@@ -202,6 +202,8 @@
 
         // Protect page
         await requireAuth();
+        const { user: currentUser } = await getCurrentUser();
+        updateInventoryNavVisibility(currentUser?.profile?.role === 'admin');
 
         let allProducts = [];
         let editingProductId = null;
@@ -433,19 +435,14 @@
             })
             .subscribe();
 
-        // Show Inventory link for admins only
-               async function checkInventoryAccess() {
-            const { user } = await getCurrentUser();
-            if (user?.profile?.role === 'admin') {
-                const inventoryNav = document.querySelector('.nav-inventory');
-            }
+        function updateInventoryNavVisibility(isAdmin) {
+            const inventoryNav = document.querySelector('.nav-inventory');
+            if (!inventoryNav) return;
+            inventoryNav.style.display = isAdmin ? 'block' : 'none';
         }
 
         // Initialize
-        checkInventoryAccess();
         loadProducts();
-
-        
     </script>
 </body>
 </html>
