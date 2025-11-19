@@ -6,38 +6,93 @@
     <title>POS System Login</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="login-container">
-        <h2>Welcome, Please Login</h2>
-        <div id="message"></div>
-        
-        <form id="loginForm">
-            <div>
-                <label>Email</label>
-                <input type="email" id="email" name="email" required autocomplete="username" placeholder="your@email.com">
-            </div>
-            
-            <div>
-                <label>Password</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
-            </div>
-            
-            <div>
-                <label>Login As</label>
-                <div class="role-selection">
-                    <label class="role-option">
-                        <input type="radio" name="role" value="admin" required>
-                        <span>Admin</span>
-                    </label>
-                    <label class="role-option">
-                        <input type="radio" name="role" value="staff" required>
-                        <span>Cashier</span>
-                    </label>
+<body class="login-page">
+    <div class="login-shell">
+        <div class="login-hero">
+            <div class="brand-mark">
+                <div class="logo-chip">ABC</div>
+                <div>
+                    <p class="brand-name">ABC POS</p>
+                    <span class="brand-tagline">Supabase Edition</span>
                 </div>
             </div>
+            <h1>Modern POS, Everywhere.</h1>
+            <p class="hero-copy">
+                Stay in sync with inventory, orders, and reports in real time. Secure authentication and
+                mobile-friendly dashboards keep your store moving fast.
+            </p>
             
-            <button type="submit" id="loginBtn">Login</button>
-        </form>
+            <ul class="hero-highlights">
+                <li>
+                    <span>⚡</span>
+                    Real-time updates with Supabase
+                </li>
+                <li>
+                    <span>📦</span>
+                    Smart inventory tracking
+                </li>
+                <li>
+                    <span>📈</span>
+                    Insightful sales reporting
+                </li>
+            </ul>
+
+            <div class="hero-metrics">
+                <div>
+                    <p class="metric-value">5x</p>
+                    <p class="metric-label">Faster checkouts</p>
+                </div>
+                <div>
+                    <p class="metric-value">24/7</p>
+                    <p class="metric-label">Cloud access</p>
+                </div>
+                <div>
+                    <p class="metric-value">100%</p>
+                    <p class="metric-label">Secure & RLS-protected</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-panel">
+            <div class="panel-header">
+                <h2>Sign in to your workspace</h2>
+                <p>Use your Supabase credentials to continue</p>
+            </div>
+
+            <div id="message"></div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="input-field">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" required autocomplete="username" placeholder="you@company.com">
+                </div>
+                
+                <div class="input-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+                </div>
+                
+                <div class="input-field">
+                    <label>Login as</label>
+                    <div class="role-selection">
+                        <label class="role-option">
+                            <input type="radio" name="role" value="admin" required>
+                            <span>Admin</span>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="role" value="staff" required>
+                            <span>Cashier</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" id="loginBtn">Continue</button>
+            </form>
+
+            <p class="support-note">
+                Need access? Contact your administrator to create an account.
+            </p>
+        </div>
     </div>
 
     <script type="module">
