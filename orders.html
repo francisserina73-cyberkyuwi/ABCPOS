@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Checkout | ABC POS</title>
+    <link rel="stylesheet" href="orders.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>ABC POS</h1>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <span class="nav-icon dashboard"></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="menu.html" class="nav-link">
+                        <span class="nav-icon menu"></span>
+                        Menu
+                    </a>
+                </li>
+                <li class="nav-item nav-inventory" style="display: none;">
+                    <a href="inventory.html" class="nav-link">
+                        <span class="nav-icon inventory"></span>
+                        Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.html" class="nav-link">
+                        <span class="nav-icon reports"></span>
+                        Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link active">
+                        <span class="nav-icon orders"></span>
+                        Orders
+                    </a>
+                </li>
+            </ul>
+            
+            <a href="#" class="logout-btn" id="logoutBtn">
+                <span class="logout-icon"></span>
+                Logout
+            </a>
+        </aside>
+
+        <!-- POS Content -->
+        <div class="pos-container">
+            <!-- Products Section -->
+            <div class="products-section">
+                <div class="header">
+                    <h2>POS Checkout</h2>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="categories">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="Pastry">Pastry</button>
+                    <button class="category-btn" data-category="Dessert">Dessert</button>
+                    <button class="category-btn" data-category="Beverage">Beverage</button>
+                </div>
+
+                <!-- Search -->
+                <div class="search-box">
+                    <input type="search" id="searchProduct" placeholder="Search products...">
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="productsGrid">
+                    <div class="loading">Loading products...</div>
+                </div>
+            </div>
+
+            <!-- Cart Section -->
+            <div class="cart-section">
+                <div class="cart-header">
+                    <h3>Current Order</h3>
+                    <button class="btn-clear" id="clearCartBtn">Clear</button>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="customer-info">
+                    <input type="text" id="customerName" placeholder="Customer Name (Optional)">
+                    <input type="tel" id="customerPhone" placeholder="Phone (Optional)">
+                </div>
+
+                <!-- Cart Items -->
+                <div class="cart-items" id="cartItems">
+                    <div class="empty-cart">
+                        <p>No items in cart</p>
+                        <p class="subtitle">Add items from the menu</p>
+                    </div>
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">₱0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total:</span>
+                        <span id="total">₱0.00</span>
+                    </div>
+                </div>
+
+                <!-- Checkout Button -->
+                <button class="btn-checkout" id="checkoutBtn" disabled>
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div class="modal" id="receiptModal">
+        <div class="modal-content receipt-content">
+            <div class="receipt" id="receiptPrint">
+                <div class="receipt-header">
+                    <h2>ABC POS System</h2>
+                    <p>Thank you for your purchase!</p>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-info">
+                    <p>Order #: <strong id="receiptOrderNo"></strong></p>
+                    <p>Date: <strong id="receiptDate"></strong></p>
+                    <p id="receiptCustomer"></p>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-items" id="receiptItems"></div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-total">
+                    <p>Total: <strong id="receiptTotal"></strong></p>
+                </div>
+            </div>
+            <div class="receipt-actions">
+                <button class="btn-secondary" id="printBtn">Print Receipt</button>
+                <button class="btn-primary" id="newOrderBtn">New Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { requireAuth, signOut } from './js/auth.js';
+        import { getProducts, createOrder } from './js/api.js';
+        import { formatCurrency, showToast, formatDate } from './js/utils.js';
+
+        // Protect page
+        await requireAuth();
+
+        let allProducts = [];
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Load products
+        async function loadProducts() {
+            const { data, error } = await getProducts({ status: 'active' });
+            if (error) {
+                showToast('Failed to load products', 'error');
+                return;
+            }
+            allProducts = data || [];
+            renderProducts();
+        }
+
+        // Render products
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const search = document.getElementById('searchProduct').value.toLowerCase();
+            
+            let filtered = allProducts;
+
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(p => p.category === currentCategory);
+            }
+
+            // Filter by search
+            if (search) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(search) ||
+                    (p.description && p.description.toLowerCase().includes(search))
+                );
+            }
+
+            // Only show in-stock items
+            filtered = filtered.filter(p => p.stock > 0);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No products available</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => `
+                <div class="product-card" onclick="window.addToCart(${product.id})">
+                    <img src="${product.image_path || 'https://via.placeholder.com/150'}" 
+                         alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="product-details">
+                        <h4>${product.name}</h4>
+                        <p class="product-price">${formatCurrency(product.price)}</p>
+                        <p class="product-stock">Stock: ${product.stock}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add to cart
+        window.addToCart = (productId) => {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            const cartItem = cart.find(item => item.product_id === productId);
+
+            if (cartItem) {
+                if (cartItem.quantity >= product.stock) {
+                    showToast('Cannot add more than available stock', 'warning');
+                    return;
+                }
+                cartItem.quantity++;
+            } else {
+                cart.push({
+                    product_id: productId,
+                    product_name: product.name,
+                    unit_price: product.price,
+                    quantity: 1,
+                    stock: product.stock
+                });
+            }
+
+            renderCart();
+            showToast(`${product.name} added to cart`, 'success', 1000);
+        };
+
+        // Remove from cart
+        window.removeFromCart = (productId) => {
+            cart = cart.filter(item => item.product_id !== productId);
+            renderCart();
+        };
+
+        // Update quantity
+        window.updateQuantity = (productId, change) => {
+            const item = cart.find(i => i.product_id === productId);
+            if (!item) return;
+
+            item.quantity += change;
+
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.product_id !== productId);
+            } else if (item.quantity > item.stock) {
+                item.quantity = item.stock;
+                showToast('Cannot exceed available stock', 'warning');
+            }
+
+            renderCart();
+        };
+
+        // Render cart
+        function renderCart() {
+            const cartContainer = document.getElementById('cartItems');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = `
+                    <div class="empty-cart">
+                        <p>No items in cart</p>
+                        <p class="subtitle">Add items from the menu</p>
+                    </div>
+                `;
+                checkoutBtn.disabled = true;
+                updateTotal();
+                return;
+            }
+
+            cartContainer.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="item-info">
+                        <h4>${item.product_name}</h4>
+                        <p>${formatCurrency(item.unit_price)}</p>
+                    </div>
+                    <div class="item-controls">
+                        <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, -1)">-</button>
+                        <span class="qty">${item.quantity}</span>
+                        <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, 1)">+</button>
+                        <button class="remove-btn" onclick="window.removeFromCart(${item.product_id})">🗑️</button>
+                    </div>
+                    <div class="item-subtotal">
+                        ${formatCurrency(item.unit_price * item.quantity)}
+                    </div>
+                </div>
+            `).join('');
+
+            checkoutBtn.disabled = false;
+            updateTotal();
+        }
+
+        // Update total
+        function updateTotal() {
+            const total = cart.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+            document.getElementById('subtotal').textContent = formatCurrency(total);
+            document.getElementById('total').textContent = formatCurrency(total);
+        }
+
+        // Clear cart
+        document.getElementById('clearCartBtn').addEventListener('click', () => {
+            if (cart.length === 0) return;
+            cart = [];
+            renderCart();
+            showToast('Cart cleared', 'info');
+        });
+
+        // Checkout
+        document.getElementById('checkoutBtn').addEventListener('click', async () => {
+            if (cart.length === 0) {
+                showToast('Cart is empty', 'warning');
+                return;
+            }
+
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Processing...';
+
+            try {
+                const orderData = {
+                    customer_name: document.getElementById('customerName').value || null,
+                    customer_phone: document.getElementById('customerPhone').value || null,
+                    items: cart
+                };
+
+                const result = await createOrder(orderData);
+
+                if (result.error) {
+                    showToast(result.error, 'error');
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.textContent = 'Checkout';
+                    return;
+                }
+
+                // Show receipt
+                showReceipt(result.data);
+
+                // Clear cart
+                cart = [];
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                renderCart();
+
+                showToast('Order completed successfully!', 'success');
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showToast('Failed to complete order', 'error');
+            } finally {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Checkout';
+            }
+        });
+
+        // Show receipt
+        function showReceipt(order) {
+            document.getElementById('receiptOrderNo').textContent = order.order_number;
+            document.getElementById('receiptDate').textContent = formatDate(order.created_at || new Date(), 'datetime');
+            
+            if (order.customer_name) {
+                document.getElementById('receiptCustomer').innerHTML = `
+                    <p>Customer: <strong>${order.customer_name}</strong></p>
+                    ${order.customer_phone ? `<p>Phone: <strong>${order.customer_phone}</strong></p>` : ''}
+                `;
+            } else {
+                document.getElementById('receiptCustomer').innerHTML = '';
+            }
+
+            document.getElementById('receiptItems').innerHTML = order.order_items.map(item => `
+                <div class="receipt-item">
+                    <span>${item.product_name} x${item.quantity}</span>
+                    <span>${formatCurrency(item.subtotal)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('receiptTotal').textContent = formatCurrency(order.total_amount);
+
+            document.getElementById('receiptModal').classList.add('active');
+        }
+
+        // Print receipt
+        document.getElementById('printBtn').addEventListener('click', () => {
+            window.print();
+        });
+
+        // New order
+        document.getElementById('newOrderBtn').addEventListener('click', () => {
+            document.getElementById('receiptModal').classList.remove('active');
+            loadProducts(); // Reload to update stock
+        });
+
+        // Category filter
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                renderProducts();
+            });
+        });
+
+        // Search
+        document.getElementById('searchProduct').addEventListener('input', renderProducts);
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut();
+        });
+
+        // Show Inventory link for admins only
+        async function checkInventoryAccess() {
+            const { user } = await getCurrentUser();
+            if (user?.profile?.role === 'admin') {
+                const inventoryNav = document.querySelector('.nav-inventory');
+                if (inventoryNav) {
+                    inventoryNav.style.display = 'block';
+                }
+            }
+        }
+
+        // Initialize
+        checkInventoryAccess();
+        loadProducts();
+    </script>
+</body>
+</html>
+

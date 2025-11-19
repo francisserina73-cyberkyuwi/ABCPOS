@@ -1,0 +1,35 @@
+# POS System - Main .htaccess
+# Security and configuration
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "\.(sql|log|md)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protect config files
+<FilesMatch "^config\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Enable error pages (optional)
+# ErrorDocument 404 /404.php
+# ErrorDocument 500 /500.php
+
+# Force HTTPS (uncomment if SSL is enabled)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# PHP settings (if allowed by hosting)
+php_value upload_max_filesize 5M
+php_value post_max_size 5M
+php_value max_execution_time 30
+php_value max_input_time 60
+
+
+

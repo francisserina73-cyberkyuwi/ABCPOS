@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | ABC POS</title>
+    <link rel="stylesheet" href="inventory.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>ABC POS</h1>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <span class="nav-icon dashboard"></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="menu.html" class="nav-link">
+                        <span class="nav-icon menu"></span>
+                        Menu
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="inventory.html" class="nav-link active">
+                        <span class="nav-icon inventory"></span>
+                        Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.html" class="nav-link">
+                        <span class="nav-icon reports"></span>
+                        Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link">
+                        <span class="nav-icon orders"></span>
+                        Orders
+                    </a>
+                </li>
+            </ul>
+            
+            <a href="#" class="logout-btn" id="logoutBtn">
+                <span class="logout-icon"></span>
+                Logout
+            </a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2>Inventory Management</h2>
+                <button class="btn-add" id="addItemBtn">+ Add New Item</button>
+            </div>
+
+            <div class="inventory-container">
+                <!-- Filters Sidebar -->
+                <aside class="filters-panel">
+                    <h3>Filters</h3>
+
+                    <!-- Product Status -->
+                    <div class="filter-group">
+                        <label class="filter-label">PRODUCT STATUS</label>
+                        <div class="status-buttons">
+                            <button class="status-btn active" data-status="all">All</button>
+                            <button class="status-btn" data-status="active">Active</button>
+                            <button class="status-btn" data-status="inactive">Inactive</button>
+                            <button class="status-btn" data-status="draft">Draft</button>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="filter-group">
+                        <label class="filter-label">CATEGORY</label>
+                        <select id="filterCategory" class="filter-select">
+                            <option value="all">All</option>
+                            <option value="Pastry">Pastry</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Beverage">Beverage</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+
+                    <!-- Stock -->
+                    <div class="filter-group">
+                        <label class="filter-label">STOCK</label>
+                        <select id="filterStock" class="filter-select">
+                            <option value="all">All</option>
+                            <option value="in">In Stock</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="filter-group">
+                        <label class="filter-label">PRICE</label>
+                        <input type="number" id="minPrice" class="filter-input" placeholder="Min ₱" step="0.01">
+                        <input type="number" id="maxPrice" class="filter-input" placeholder="Max ₱" step="0.01">
+                    </div>
+                </aside>
+
+                <!-- Products List -->
+                <div class="products-section">
+                    <div id="productsList" class="products-list">
+                        <div class="loading">Loading products...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Product</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">Product Name *</label>
+                    <input type="text" id="productName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">Price *</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productStock">Stock *</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productCategory">Category *</label>
+                        <select id="productCategory" required>
+                            <option value="Pastry">Pastry</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Beverage">Beverage</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productStatus">Status *</label>
+                        <select id="productStatus" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productPerishable">
+                        Perishable Item
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="productImage">Product Image</label>
+                    <input type="file" id="productImage" accept="image/*">
+                    <div id="imagePreview"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-primary" id="submitBtn">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { requireAuth, signOut } from './js/auth.js';
+        import { getProducts, createProduct, updateProduct, deleteProduct } from './js/api.js';
+        import { uploadImage } from './js/storage.js';
+        import { supabase } from './js/supabase-client.js';
+        import { formatCurrency, showToast, confirm } from './js/utils.js';
+
+        // Protect page
+        await requireAuth();
+
+        let allProducts = [];
+        let editingProductId = null;
+        let currentFilters = {
+            status: 'all',
+            category: 'all',
+            stock: 'all',
+            minPrice: null,
+            maxPrice: null
+        };
+
+        // Load products
+        async function loadProducts() {
+            const { data, error } = await getProducts();
+            if (error) {
+                showToast('Failed to load products', 'error');
+                return;
+            }
+            allProducts = data || [];
+            applyFilters();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            let filtered = allProducts;
+
+            // Status filter
+            if (currentFilters.status !== 'all') {
+                filtered = filtered.filter(p => p.status === currentFilters.status);
+            }
+
+            // Category filter
+            if (currentFilters.category !== 'all') {
+                filtered = filtered.filter(p => p.category === currentFilters.category);
+            }
+
+            // Stock filter
+            if (currentFilters.stock === 'in') {
+                filtered = filtered.filter(p => p.stock > 10);
+            } else if (currentFilters.stock === 'low') {
+                filtered = filtered.filter(p => p.stock > 0 && p.stock <= 10);
+            } else if (currentFilters.stock === 'out') {
+                filtered = filtered.filter(p => p.stock === 0);
+            }
+
+            // Price filter
+            if (currentFilters.minPrice !== null) {
+                filtered = filtered.filter(p => p.price >= currentFilters.minPrice);
+            }
+            if (currentFilters.maxPrice !== null) {
+                filtered = filtered.filter(p => p.price <= currentFilters.maxPrice);
+            }
+
+            renderProducts(filtered);
+        }
+
+        // Render products
+        function renderProducts(products) {
+            const container = document.getElementById('productsList');
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="empty-state">No products found</div>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => {
+                const stockText = product.stock === 0 
+                    ? 'Out of Stock' 
+                    : `${product.stock} In Stock`;
+                const stockClass = product.stock === 0 ? 'text-danger' : 'text-success';
+
+                return `
+                    <div class="product-card">
+                        <div class="product-main">
+                            ${product.image_path ? `
+                                <img src="${product.image_path}" 
+                                     alt="${product.name}" 
+                                     class="product-thumbnail"
+                                     onerror="this.style.display='none'">
+                            ` : ''}
+                            <div class="product-info">
+                                <h4 class="product-name">${product.name}</h4>
+                                <p class="product-stock ${stockClass}">Stocked Product: ${stockText}</p>
+                            </div>
+                        </div>
+                        <div class="product-details">
+                            <span class="status-badge status-${product.status}">${product.status}</span>
+                            <span class="product-category">${product.category}</span>
+                            <span class="product-price">${formatCurrency(product.price)}</span>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn" onclick="window.editProduct(${product.id})" title="Edit">
+                                    ✏️
+                                </button>
+                                <button class="action-btn delete-btn" onclick="window.deleteProductConfirm(${product.id})" title="Delete">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show modal
+        function showModal(title, product = null) {
+            editingProductId = product?.id || null;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+
+            if (product) {
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productStock').value = product.stock;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('productStatus').value = product.status;
+                document.getElementById('productPerishable').checked = product.perishable;
+
+                if (product.image_path) {
+                    document.getElementById('imagePreview').innerHTML = `
+                        <img src="${product.image_path}" alt="Preview" style="max-width: 200px; margin-top: 10px; border-radius: 8px;">
+                    `;
+                }
+            }
+
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+            editingProductId = null;
+        }
+
+        // Edit product
+        window.editProduct = async (id) => {
+            const product = allProducts.find(p => p.id === id);
+            if (product) {
+                showModal('Edit Product', product);
+            }
+        };
+
+        // Delete product
+        window.deleteProductConfirm = async (id) => {
+            const confirmed = await confirm('Are you sure you want to delete this product?', 'Delete Product');
+            if (!confirmed) return;
+
+            const result = await deleteProduct(id);
+            if (result.error) {
+                showToast(result.error, 'error');
+            } else {
+                showToast('Product deleted successfully', 'success');
+                loadProducts();
+            }
+        };
+
+        // Handle form submit
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            try {
+                // Upload image if selected
+                let imagePath = null;
+                const imageFile = document.getElementById('productImage').files[0];
+                
+                if (imageFile) {
+                    console.log('📤 Uploading image:', imageFile.name);
+                    submitBtn.textContent = 'Uploading image...';
+                    
+                    const uploadResult = await uploadImage(imageFile, 'products');
+                    
+                    if (uploadResult.success) {
+                        imagePath = uploadResult.url;
+                        console.log('✅ Image uploaded successfully:', imagePath);
+                        showToast('Image uploaded successfully!', 'success', 2000);
+                    } else {
+                        console.error('❌ Image upload failed:', uploadResult.error);
+                        showToast(`Image upload failed: ${uploadResult.error}`, 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Save Product';
+                        return;
+                    }
+                    
+                    submitBtn.textContent = 'Saving product...';
+                }
+
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    description: document.getElementById('productDescription').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    stock: parseInt(document.getElementById('productStock').value),
+                    category: document.getElementById('productCategory').value,
+                    status: document.getElementById('productStatus').value,
+                    perishable: document.getElementById('productPerishable').checked
+                };
+
+                if (imagePath) {
+                    productData.image_path = imagePath;
+                    console.log('💾 Saving product with image URL:', imagePath);
+                }
+
+                let result;
+                if (editingProductId) {
+                    result = await updateProduct(editingProductId, productData);
+                } else {
+                    result = await createProduct(productData);
+                }
+
+                if (result.error) {
+                    console.error('❌ Product save failed:', result.error);
+                    showToast(result.error, 'error');
+                } else {
+                    console.log('✅ Product saved successfully!');
+                    showToast(`Product ${editingProductId ? 'updated' : 'created'} successfully!`, 'success');
+                    closeModal();
+                    loadProducts();
+                }
+            } catch (error) {
+                console.error('❌ Form submit error:', error);
+                showToast('Failed to save product: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save Product';
+            }
+        });
+
+        // Status button filters
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilters.status = btn.dataset.status;
+                applyFilters();
+            });
+        });
+
+        // Category filter
+        document.getElementById('filterCategory').addEventListener('change', (e) => {
+            currentFilters.category = e.target.value;
+            applyFilters();
+        });
+
+        // Stock filter
+        document.getElementById('filterStock').addEventListener('change', (e) => {
+            currentFilters.stock = e.target.value;
+            applyFilters();
+        });
+
+        // Price filters
+        document.getElementById('minPrice').addEventListener('input', (e) => {
+            currentFilters.minPrice = e.target.value ? parseFloat(e.target.value) : null;
+            applyFilters();
+        });
+
+        document.getElementById('maxPrice').addEventListener('input', (e) => {
+            currentFilters.maxPrice = e.target.value ? parseFloat(e.target.value) : null;
+            applyFilters();
+        });
+
+        // Image preview on file select
+        document.getElementById('productImage').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select an image file', 'error');
+                    e.target.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Image size must be less than 5MB', 'error');
+                    e.target.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    preview.innerHTML = `
+                        <div style="margin-top: 10px;">
+                            <p style="color: #64748b; font-size: 13px; margin-bottom: 8px;">Preview:</p>
+                            <img src="${event.target.result}" 
+                                 alt="Preview" 
+                                 style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <p style="color: #10b981; font-size: 12px; margin-top: 5px;">
+                                ✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)
+                            </p>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        // Event listeners
+        document.getElementById('addItemBtn').addEventListener('click', () => showModal('Add New Product'));
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut();
+        });
+
+        // Real-time updates
+        supabase
+            .channel('inventory-products')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+                loadProducts();
+            })
+            .subscribe();
+
+        // Initialize
+        loadProducts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+/* ===== Global Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+  background: #1e1e1e;
+  color: #fff;
+  display: flex;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 220px;
+  background: #2c2c2c;
+  height: 100vh;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+}
+
+.sidebar h2 {
+  color: #f1c40f;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.sidebar a {
+  display: block;
+  color: #aaa;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 6px 0;
+  transition: 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background: #f1c40f;
+  color: #000;
+  font-weight: bold;
+}
+
+/* ===== Main Content ===== */
+.main {
+  margin-left: 220px;
+  padding: 20px;
+  flex: 1;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+header h1 {
+  font-size: 22px;
+}
+
+.header-icons span {
+  margin-left: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ===== Cards (Top Stats) ===== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #2c2c2c;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.card h3 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #f1c40f;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ===== Product Lists ===== */
+.products {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.box {
+  background: #2c2c2c;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.box h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  color: #f1c40f;
+}
+
+.box ul {
+  list-style: none;
+}
+
+.box ul li {
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.box ul li span {
+  float: right;
+  font-weight: bold;
+}
+
+.in-stock {
+  color: #2ecc71;
+}
+
+.out-stock {
+  color: #e74c3c;
+}
+
+/* ===== Chart Section ===== */
+.chart {
+  background: #2c2c2c;
+  padding: 15px;
+  border-radius: 12px;
+}

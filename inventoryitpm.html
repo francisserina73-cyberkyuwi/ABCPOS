@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory | ABC POS</title>
+  <link rel="stylesheet" href="inventory.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>ABC POS</h1>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.php" class="nav-link">
+            <span class="nav-icon dashboard"></span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="menu.php" class="nav-link">
+            <span class="nav-icon menu"></span>
+            <span>Menu</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="inventoryitpm.html" class="nav-link active">
+            <span class="nav-icon inventory"></span>
+            <span>Inventory</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reports.php" class="nav-link">
+            <span class="nav-icon reports"></span>
+            <span>Reports</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="menu.php" class="nav-link">
+            <span class="nav-icon orders"></span>
+            <span>Orders</span>
+          </a>
+        </li>
+      </ul>
+      <div class="logout-section">
+        <a href="index.php" class="logout-link">
+          <span class="logout-icon"></span>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <header class="header">
+        <h1>Inventory Management</h1>
+        <button class="add-btn">+ Add New Item</button>
+      </header>
+
+      <div class="content">
+        <!-- Left filter panel -->
+        <section class="filters">
+          <h2>Filters</h2>
+          <hr class="filter-divider">
+
+         <div class="filter-section">
+  <h3>Product Status</h3>
+  <div class="status-buttons">
+    <button class="status active" data-status="all">All</button>
+    <button class="status" data-status="active">Active</button>
+    <button class="status" data-status="inactive">Inactive</button>
+    <button class="status" data-status="draft">Draft</button>
+  </div>
+</div>
+
+          <div class="filter-section">
+            <h3>Category</h3>
+            <select id="categoryFilter">
+  <option value="all">All</option>
+  <option value="pastry">Pastry</option>
+  <option value="dessert">Dessert</option>
+</select>
+          </div>
+
+          <div class="filter-section">
+  <h3>Stock</h3>
+  <select id="stockFilter">
+    <option value="all">All</option>
+    <option value="in">In Stock</option>
+    <option value="out">Out of Stock</option>
+  </select>
+</div>
+
+
+         <div class="filter-section">
+  <h3>Price</h3>
+  <div class="price-range">
+    <input id="minPrice" type="number" placeholder="Min ₱">
+  </div>
+  <div class="price-range">
+    <input id="maxPrice" type="number" placeholder="Max ₱">
+  </div>
+</div>
+        </section>
+
+        <!-- Right inventory list -->
+        <section class="inventory-list">
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Ensaymada</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Pastry</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Leche Flan">
+            <div class="info">
+              <h4>Torta</h4>
+              <p>Stocked Product: <span class="in-stock">8 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Pastry</p>
+            <p class="price">₱75.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Pichi-Pichi">
+            <div class="info">
+              <h4>Cookies</h4>
+              <p>Stocked Product: <span class="out-stock">Out of Stock</span></p>
+            </div>
+            <p class="status-text inactive">Inactive</p>
+            <p class="category">Dessert</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Biscuits</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Pastry</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Leche Flan</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Dessert</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Cassava Cake</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Dessert</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Pichi-Pichi</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Dessert</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+
+          <div class="inventory-card">
+            <img src="https://via.placeholder.com/60" alt="Chicken Parmesan">
+            <div class="info">
+              <h4>Brownies</h4>
+              <p>Stocked Product: <span class="in-stock">10 In Stock</span></p>
+            </div>
+            <p class="status-text active">Active</p>
+            <p class="category">Dessert</p>
+            <p class="price">₱55.00</p>
+            <div class="actions">
+              <button class="edit">✏️</button>
+              <button class="delete">🗑️</button>
+            </div>
+          </div>
+          
+        </section>
+
+        <div class="inventory-panel" id="inventoryPanel">
+  <div class="panel-content">
+    <div class="panel-header">
+      <h2>Edit New Inventory</h2>
+      <button class="close-btn" id="closePanel">×</button>
+    </div>
+
+    <hr>
+
+    <div class="panel-body">
+      <div class="image-section">
+        <img src="https://via.placeholder.com/150" alt="Preview" id="previewImage">
+        <a href="#" class="change-photo">Change Profile Picture</a>
+      </div>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" placeholder="Chicken Parmesan">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select>
+            <option>Dessert</option>
+            <option>Pastry</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Stock</label>
+          <select>
+            <option>In Stock</option>
+            <option>Out of Stock</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" placeholder="10">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select>
+            <option>Active</option>
+            <option>Inactive</option>
+            <option>Draft</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Price</label>
+        <input type="text" placeholder="₱55.00">
+      </div>
+
+      <div class="form-group perishable-group">
+  <label>Perishable </label>
+  <div class="radio-inline">
+    <label><input type="radio" name="perishable" checked> Yes</label>
+    <label><input type="radio" name="perishable"> No</label>
+  </div>
+</div>
+
+
+      <div class="button-group">
+        <button class="cancel-btn" id="cancelPanel">Cancel</button>
+        <button class="save-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+    </main>
+  </div>
+
+  
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const categoryFilter = document.getElementById("categoryFilter");
+  const stockFilter = document.getElementById("stockFilter");
+  const minPrice = document.getElementById("minPrice");
+  const maxPrice = document.getElementById("maxPrice");
+  const statusButtons = document.querySelectorAll(".status");
+  const inventoryCards = document.querySelectorAll(".inventory-card");
+
+  let selectedStatus = "all"; // Default
+
+  // 🔹 Function to filter items
+  function filterItems() {
+    const selectedCategory = categoryFilter.value.toLowerCase();
+    const selectedStock = stockFilter.value.toLowerCase();
+    const min = parseFloat(minPrice.value) || 0;
+    const max = parseFloat(maxPrice.value) || Infinity;
+
+    inventoryCards.forEach(card => {
+      // Get category, stock, status, and price
+      const categoryText = card.querySelector(".category").textContent.trim().toLowerCase();
+      const stockText = card.querySelector(".info span").classList.contains("in-stock") ? "in" : "out";
+      const statusText = card.querySelector(".status-text").textContent.trim().toLowerCase();
+      const priceText = card.querySelector(".price").textContent.replace(/[₱$]/g, "").trim();
+      const priceValue = parseFloat(priceText);
+
+      // Check category, stock, status, and price range
+      const matchCategory = selectedCategory === "all" || categoryText === selectedCategory;
+      const matchStock = selectedStock === "all" || stockText === selectedStock;
+      const matchStatus = selectedStatus === "all" || statusText === selectedStatus;
+      const matchPrice = priceValue >= min && priceValue <= max;
+
+      // Show or hide product
+      if (matchCategory && matchStock && matchStatus && matchPrice) {
+        card.style.display = "grid";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+  // 🔹 Listen for dropdown and input changes
+  categoryFilter.addEventListener("change", filterItems);
+  stockFilter.addEventListener("change", filterItems);
+  minPrice.addEventListener("input", filterItems);
+  maxPrice.addEventListener("input", filterItems);
+
+  // 🔹 Handle status button clicks
+  statusButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      // remove active class from all
+      statusButtons.forEach(btn => btn.classList.remove("active"));
+      // set new active
+      button.classList.add("active");
+      // set selected status
+      selectedStatus = button.dataset.status.toLowerCase();
+      // re-filter
+      filterItems();
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const addBtn = document.querySelector(".add-btn");
+  const panel = document.getElementById("inventoryPanel");
+  const closeBtn = document.getElementById("closePanel");
+  const cancelBtn = document.getElementById("cancelPanel");
+
+  function openPanel() {
+    panel.classList.add("active");
+  }
+
+  function closePanel() {
+    panel.classList.remove("active");
+  }
+
+  addBtn.addEventListener("click", openPanel);
+  closeBtn.addEventListener("click", closePanel);
+  cancelBtn.addEventListener("click", closePanel);
+});
+</script>
+
+</body>
+</html>
