@@ -194,12 +194,11 @@
     </div>
 
     <script type="module">
-        import { requireAuth, signOut } from './js/auth.js';
+        import { requireAuth, getCurrentUser, signOut } from './js/auth.js';
         import { getProducts, createProduct, updateProduct, deleteProduct } from './js/api.js';
         import { uploadImage } from './js/storage.js';
         import { supabase } from './js/supabase-client.js';
         import { formatCurrency, showToast, confirm } from './js/utils.js';
-            import { requireAuth, signOut } from './js/auth.js';
 
         // Protect page
         await requireAuth();
