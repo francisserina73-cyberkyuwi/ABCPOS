@@ -199,6 +199,7 @@
         import { uploadImage } from './js/storage.js';
         import { supabase } from './js/supabase-client.js';
         import { formatCurrency, showToast, confirm } from './js/utils.js';
+            import { requireAuth, signOut } from './js/auth.js';
 
         // Protect page
         await requireAuth();
@@ -434,19 +435,18 @@
             .subscribe();
 
         // Show Inventory link for admins only
-        async function checkInventoryAccess() {
+               async function checkInventoryAccess() {
             const { user } = await getCurrentUser();
             if (user?.profile?.role === 'admin') {
                 const inventoryNav = document.querySelector('.nav-inventory');
-                if (inventoryNav) {
-                    inventoryNav.style.display = 'block';
-                }
             }
         }
 
         // Initialize
         checkInventoryAccess();
         loadProducts();
+
+        
     </script>
 </body>
 </html>
