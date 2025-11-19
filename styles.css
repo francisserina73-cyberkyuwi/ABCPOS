@@ -244,112 +244,20 @@ body {
 }
 
 .login-shell {
-  width: min(1200px, 100%);
-  background: #fff;
+  width: min(520px, 100%);
+  background: #ffffff;
   border-radius: 28px;
   box-shadow: 0 40px 120px rgba(15, 23, 42, 0.15);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  overflow: hidden;
+  padding: 56px 48px;
 }
 
-.login-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
-  color: #fff;
-  padding: 64px 56px;
+.login-shell.single-panel {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.brand-mark {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-chip {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.brand-name {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.brand-tagline {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.login-hero h1 {
-  font-size: clamp(32px, 3vw, 44px);
-  line-height: 1.2;
-}
-
-.hero-copy {
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.6;
-}
-
-.hero-highlights {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.hero-highlights li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-highlights span {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  display: grid;
-  place-items: center;
-}
-
-.hero-metrics {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.hero-metrics div {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
-  padding: 16px;
-  text-align: center;
-  backdrop-filter: blur(4px);
-}
-
-.metric-value {
-  font-size: 26px;
-  font-weight: 600;
-}
-
-.metric-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .login-panel {
-  padding: 56px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -475,28 +383,14 @@ body {
   text-align: center;
 }
 
-@media (max-width: 960px) {
-  .login-shell {
-    grid-template-columns: 1fr;
-    border-radius: 20px;
-  }
-
-  .login-hero {
-    padding: 48px 32px;
-  }
-
-  .login-panel {
-    padding: 40px 32px;
-  }
-}
-
 @media (max-width: 600px) {
   .login-page {
     padding: 20px 12px;
   }
 
-  .hero-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .login-shell {
+    padding: 40px 28px;
+    border-radius: 20px;
   }
 
   .role-selection {
