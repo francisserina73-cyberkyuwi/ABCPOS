@@ -354,6 +354,13 @@ body {
     overflow-y: auto;
     margin-bottom: 20px;
     max-height: calc(100vh - 450px);
+    min-height: 100px;
+    padding: 10px 0;
+}
+
+.cart-items.has-items {
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .empty-cart {
@@ -370,12 +377,13 @@ body {
 
 .cart-item {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 2px solid #e2e8f0;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 12px;
     transition: all 0.3s;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
 .cart-item:hover {

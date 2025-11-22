@@ -711,6 +711,7 @@
             const cartContainer = document.getElementById('cartItems');
 
             if (cart.length === 0) {
+                cartContainer.classList.remove('has-items');
                 cartContainer.innerHTML = `
                     <div class="empty-cart">
                         <p>No items in cart</p>
@@ -723,6 +724,7 @@
                 return;
             }
 
+            cartContainer.classList.add('has-items');
             cartContainer.innerHTML = cart.map(item => `
                 <div class="cart-item" data-product-id="${item.product_id}">
                     <div class="item-info">
