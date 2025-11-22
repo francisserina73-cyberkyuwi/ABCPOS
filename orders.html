@@ -127,12 +127,6 @@
                             </div>
                         </label>
                         <label class="payment-option">
-                            <input type="radio" name="paymentMethod" value="card">
-                            <div>
-                                <span class="payment-title">Card</span>
-                            </div>
-                        </label>
-                        <label class="payment-option">
                             <input type="radio" name="paymentMethod" value="gcash">
                             <div>
                                 <span class="payment-title">GCash QR</span>
@@ -522,10 +516,6 @@
                 return gcashPaymentConfirmed ? PAYMENT_STATUS.PAID : PAYMENT_STATUS.AWAITING;
             }
 
-            if (selectedPaymentMethod === PAYMENT_METHODS.CARD) {
-                return PAYMENT_STATUS.PENDING;
-            }
-
             return PAYMENT_STATUS.PAID;
         }
 
@@ -533,8 +523,6 @@
             switch (method) {
                 case PAYMENT_METHODS.GCASH:
                     return 'GCash QR';
-                case PAYMENT_METHODS.CARD:
-                    return 'Card';
                 default:
                     return 'Cash';
             }
@@ -671,6 +659,53 @@
             renderCart();
         };
 
+        // Set quantity directly from input
+        window.setQuantity = (productId, newQuantity) => {
+            const item = cart.find(i => i.product_id === productId);
+            if (!item) return;
+
+            const qty = parseInt(newQuantity, 10);
+            if (!Number.isFinite(qty) || qty <= 0) {
+                showToast('Enter a valid quantity', 'warning');
+                renderCart();
+                return;
+            }
+
+            if (qty > item.stock) {
+                showToast('Cannot exceed available stock', 'warning');
+                item.quantity = item.stock;
+            } else {
+                item.quantity = qty;
+            }
+
+            invalidateGcashPayment();
+            renderCart();
+        };
+
+        // Validate quantity on blur
+        window.validateQuantity = (productId, inputElement) => {
+            const item = cart.find(i => i.product_id === productId);
+            if (!item) return;
+
+            const qty = parseInt(inputElement.value, 10);
+            if (!Number.isFinite(qty) || qty <= 0) {
+                inputElement.value = item.quantity;
+                showToast('Quantity must be at least 1', 'warning');
+                return;
+            }
+
+            if (qty > item.stock) {
+                inputElement.value = item.stock;
+                item.quantity = item.stock;
+                showToast('Cannot exceed available stock', 'warning');
+            } else {
+                item.quantity = qty;
+            }
+
+            invalidateGcashPayment();
+            renderCart();
+        };
+
         // Render cart
         function renderCart() {
             const cartContainer = document.getElementById('cartItems');
@@ -696,7 +731,9 @@
                     </div>
                     <div class="item-controls">
                         <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, -1)">-</button>
-                        <span class="qty">${item.quantity}</span>
+                        <input type="number" class="qty-input" value="${item.quantity}" min="1" max="${item.stock}" 
+                               onchange="window.setQuantity(${item.product_id}, this.value)" 
+                               onblur="window.validateQuantity(${item.product_id}, this)">
                         <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, 1)">+</button>
                         <button class="remove-btn" onclick="window.removeFromCart(${item.product_id})">🗑️</button>
                     </div>
