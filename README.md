@@ -177,6 +177,30 @@ vercel deploy        # Deploy to Vercel
 
 ---
 
+## 💳 GCash Payments
+
+The Orders tab now supports native GCash QR checkout for both admins and cashiers. Configure your wallet details through the Vite environment file so the generated QR includes the right account info:
+
+```env
+VITE_GCASH_ACCOUNT_NAME="ABC Bakery"
+VITE_GCASH_ACCOUNT_NUMBER="09XXXXXXXXX"
+VITE_GCASH_MESSAGE="Scan to pay via GCash"
+VITE_GCASH_REFERENCE_PREFIX="GCASH-QR"
+```
+
+If these keys are missing the UI falls back to demo values, but updating them ensures the QR code, reference tags, and receipts reflect your real GCash account.
+
+Flow:
+- Select **GCash QR** in the payment section (available to admin & cashier roles).
+- Show the QR, let the customer scan, then mark the payment as received.
+- Checkout stays disabled until the payment is confirmed, ensuring every order records the method, status, optional reference number, and (optionally) a QR payload/metadata.
+
+---
+
+### Static GCash QR option
+
+If you already have an official GCash QR image, drop it into `assets/gcash-qr.png` (or update the path in `orders.html`) and the modal will display that exact image instead of generating one on the fly. Cashiers still need to click **Payment Received** so the order unlocks and the correct payment status is stored.
+
 ## 🆘 Need Help?
 
 **Check browser console (F12)** for errors first!

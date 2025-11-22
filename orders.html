@@ -112,10 +112,110 @@
                     </div>
                 </div>
 
+                <!-- Payment Section -->
+                <div class="payment-section">
+                    <div class="payment-header">
+                        <h4>Payment Method</h4>
+                        <span class="payment-hint" id="paymentHint">Select how the customer will pay</span>
+                    </div>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="cash" checked>
+                            <div>
+                                <span class="payment-title">Cash</span>
+                                <span class="payment-desc">Mark as paid immediately</span>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="card">
+                            <div>
+                                <span class="payment-title">Card</span>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="gcash">
+                            <div>
+                                <span class="payment-title">GCash QR</span>
+                                <span class="payment-desc">Show the official QR for payment</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="gcash-panel" id="gcashPanel">
+                        <div class="gcash-details">
+                            <p>Account Name: <strong id="gcashAccountName"></strong></p>
+                            <p class="gcash-inline">
+                                GCash Number:
+                                <strong id="gcashAccountNumber"></strong>
+                                <button class="btn-copy" id="gcashCopyNumberBtn" type="button">Copy</button>
+                            </p>
+                            <p class="gcash-inline">
+                                Message:
+                                <strong id="gcashMessage"></strong>
+                            </p>
+                        </div>
+                        <div class="gcash-actions">
+                            <button class="btn-secondary" id="gcashShowQrBtn" type="button" disabled>Show QR Code</button>
+                            <button class="btn-link" id="gcashResetBtn" type="button">Reset QR</button>
+                        </div>
+                        <p class="gcash-status" id="gcashStatus">Add items to start a GCash payment.</p>
+                    </div>
+                </div>
+
                 <!-- Checkout Button -->
                 <button class="btn-checkout" id="checkoutBtn" disabled>
                     Checkout
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GCash QR Modal -->
+    <div class="modal" id="gcashModal">
+        <div class="modal-content gcash-modal">
+            <button class="modal-close" id="gcashModalClose" type="button">&times;</button>
+            <div class="gcash-modal-body">
+                <div class="gcash-modal-header">
+                    <span class="gcash-badge">GCash Payment</span>
+                    <p>Order <strong id="gcashOrderNumber"></strong></p>
+                </div>
+                <div class="gcash-modal-amount">
+                    <span>Total Due</span>
+                    <strong id="gcashAmount">₱0.00</strong>
+                </div>
+                <div class="gcash-qr-wrapper">
+                    <img src="./assets/gcash-qr.png" alt="GCash QR" class="gcash-qr-image" id="gcashQrImage">
+                </div>
+                <p class="gcash-modal-instructions">
+                    Ask the customer to scan this official QR with their GCash app. Confirm the payment before finishing the order.
+                </p>
+                <label for="gcashReferenceInput">GCash Reference (optional)</label>
+                <input type="text" id="gcashReferenceInput" placeholder="Enter reference or last 4 digits">
+                <div class="gcash-modal-actions">
+                    <button class="btn-primary" id="gcashMarkPaidBtn" type="button">Payment Received</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity Modal -->
+    <div class="modal" id="quantityModal">
+        <div class="modal-content quantity-modal">
+            <button class="modal-close" id="quantityModalClose" type="button">&times;</button>
+            <div class="quantity-body">
+                <span class="quantity-badge">Set Quantity</span>
+                <h3 id="quantityProductName"></h3>
+                <p class="quantity-price" id="quantityProductPrice"></p>
+                        <label for="quantityInput">Quantity</label>
+                        <div class="quantity-input-group">
+                            <button class="qty-adjust-btn" type="button" data-change="-1">-</button>
+                            <input type="number" id="quantityInput" min="1" step="1" value="1">
+                            <button class="qty-adjust-btn" type="button" data-change="1">+</button>
+                        </div>
+                <small class="quantity-hint" id="quantityStockHint"></small>
+                <div class="quantity-actions">
+                    <button class="btn-secondary" id="quantityCancelBtn" type="button">Cancel</button>
+                    <button class="btn-primary" id="quantityConfirmBtn" type="button">Add to Order</button>
+                </div>
             </div>
         </div>
     </div>
@@ -135,6 +235,12 @@
                     <p id="receiptCustomer"></p>
                 </div>
                 <div class="receipt-divider"></div>
+                <div class="receipt-payment">
+                    <p>Payment Method: <strong id="receiptPaymentMethod"></strong></p>
+                    <p>Status: <strong id="receiptPaymentStatus"></strong></p>
+                    <p id="receiptPaymentReference"></p>
+                </div>
+                <div class="receipt-divider"></div>
                 <div class="receipt-items" id="receiptItems"></div>
                 <div class="receipt-divider"></div>
                 <div class="receipt-total">
@@ -151,7 +257,8 @@
     <script type="module">
         import { requireAuth, getCurrentUser, signOut } from './js/auth.js';
         import { getProducts, createOrder } from './js/api.js';
-        import { formatCurrency, showToast, formatDate } from './js/utils.js';
+        import { formatCurrency, showToast, formatDate, copyToClipboard } from './js/utils.js';
+        import { GCASH_CONFIG, PAYMENT_METHODS, PAYMENT_STATUS } from './js/config.js';
 
         // Protect page
         await requireAuth();
@@ -159,6 +266,296 @@
         let allProducts = [];
         let cart = [];
         let currentCategory = 'all';
+        let selectedPaymentMethod = PAYMENT_METHODS.CASH;
+        let gcashOrderNumber = null;
+        let gcashPaymentConfirmed = false;
+        let gcashReferenceValue = '';
+        let selectedProductId = null;
+
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const paymentHint = document.getElementById('paymentHint');
+        const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+        const gcashPanel = document.getElementById('gcashPanel');
+        const gcashAccountNameEl = document.getElementById('gcashAccountName');
+        const gcashAccountNumberEl = document.getElementById('gcashAccountNumber');
+        const gcashMessageEl = document.getElementById('gcashMessage');
+        const gcashStatusEl = document.getElementById('gcashStatus');
+        const gcashShowQrBtn = document.getElementById('gcashShowQrBtn');
+        const gcashResetBtn = document.getElementById('gcashResetBtn');
+        const gcashCopyBtn = document.getElementById('gcashCopyNumberBtn');
+        const gcashModal = document.getElementById('gcashModal');
+        const gcashModalClose = document.getElementById('gcashModalClose');
+        const gcashOrderNumberEl = document.getElementById('gcashOrderNumber');
+        const gcashAmountEl = document.getElementById('gcashAmount');
+        const gcashReferenceInput = document.getElementById('gcashReferenceInput');
+        const gcashMarkPaidBtn = document.getElementById('gcashMarkPaidBtn');
+        const quantityModal = document.getElementById('quantityModal');
+        const quantityModalClose = document.getElementById('quantityModalClose');
+        const quantityProductName = document.getElementById('quantityProductName');
+        const quantityProductPrice = document.getElementById('quantityProductPrice');
+        const quantityStockHint = document.getElementById('quantityStockHint');
+        const quantityInput = document.getElementById('quantityInput');
+        const quantityConfirmBtn = document.getElementById('quantityConfirmBtn');
+        const quantityCancelBtn = document.getElementById('quantityCancelBtn');
+
+        gcashAccountNameEl.textContent = GCASH_CONFIG.accountName;
+        gcashAccountNumberEl.textContent = GCASH_CONFIG.accountNumber;
+        gcashMessageEl.textContent = GCASH_CONFIG.message;
+
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', () => handlePaymentChange(radio.value));
+        });
+
+        gcashCopyBtn.addEventListener('click', () => {
+            copyToClipboard(GCASH_CONFIG.accountNumber);
+        });
+
+        gcashShowQrBtn.addEventListener('click', handleShowGcashQr);
+        gcashResetBtn.addEventListener('click', () => {
+            closeGcashModal();
+            resetGcashState();
+            updateGcashStatus();
+            showToast('GCash payment reset', 'info');
+        });
+
+        gcashModalClose.addEventListener('click', closeGcashModal);
+        gcashModal.addEventListener('click', (event) => {
+            if (event.target === gcashModal) {
+                closeGcashModal();
+            }
+        });
+
+        gcashMarkPaidBtn.addEventListener('click', handleGcashPaymentReceived);
+
+        quantityModalClose.addEventListener('click', closeQuantityModal);
+        quantityCancelBtn.addEventListener('click', closeQuantityModal);
+        quantityModal.addEventListener('click', (event) => {
+            if (event.target === quantityModal) {
+                closeQuantityModal();
+            }
+        });
+        quantityConfirmBtn.addEventListener('click', handleQuantityConfirm);
+        quantityInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleQuantityConfirm();
+            }
+        });
+        document.querySelectorAll('.qty-adjust-btn').forEach(btn => {
+            btn.addEventListener('click', () => adjustQuantity(parseInt(btn.dataset.change, 10)));
+        });
+
+        handlePaymentChange(PAYMENT_METHODS.CASH);
+
+        function handlePaymentChange(method) {
+            selectedPaymentMethod = method;
+            const isGcash = method === PAYMENT_METHODS.GCASH;
+            if (gcashPanel) {
+                gcashPanel.classList.toggle('active', isGcash);
+            }
+            paymentHint.textContent = isGcash
+                ? 'Show the QR and confirm once the customer pays.'
+                : 'Select how the customer will pay';
+            if (!isGcash) {
+                resetGcashState();
+            }
+            updateGcashStatus();
+            updateCheckoutButtonState();
+        }
+
+        function resetGcashState() {
+            gcashOrderNumber = null;
+            gcashPaymentConfirmed = false;
+            gcashReferenceValue = '';
+            if (gcashReferenceInput) {
+                gcashReferenceInput.value = '';
+            }
+        }
+
+        function invalidateGcashPayment() {
+            if (selectedPaymentMethod !== PAYMENT_METHODS.GCASH) return;
+            resetGcashState();
+            updateGcashStatus();
+            updateCheckoutButtonState();
+        }
+
+        function getCartTotal() {
+            return cart.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+        }
+
+        function updateCheckoutButtonState() {
+            if (!checkoutBtn) return;
+            const isCartEmpty = cart.length === 0;
+            const requiresGcashConfirmation = selectedPaymentMethod === PAYMENT_METHODS.GCASH && !gcashPaymentConfirmed;
+            checkoutBtn.disabled = isCartEmpty || requiresGcashConfirmation;
+            checkoutBtn.textContent = selectedPaymentMethod === PAYMENT_METHODS.GCASH
+                ? 'Complete GCash Order'
+                : 'Checkout';
+        }
+
+        function updateGcashStatus() {
+            if (!gcashStatusEl) return;
+            if (selectedPaymentMethod !== PAYMENT_METHODS.GCASH) {
+                gcashStatusEl.textContent = '';
+                gcashStatusEl.dataset.state = '';
+                gcashShowQrBtn.disabled = true;
+                return;
+            }
+
+            if (cart.length === 0) {
+                gcashStatusEl.textContent = 'Add items to start a GCash payment.';
+                gcashStatusEl.dataset.state = 'info';
+                gcashShowQrBtn.disabled = true;
+                return;
+            }
+
+            gcashShowQrBtn.disabled = false;
+
+            if (gcashPaymentConfirmed) {
+                gcashStatusEl.textContent = 'Payment marked as received. You can finish the order.';
+                gcashStatusEl.dataset.state = 'success';
+            } else {
+                gcashStatusEl.textContent = 'Show the QR and confirm once the payment is received.';
+                gcashStatusEl.dataset.state = 'warning';
+            }
+        }
+
+        function handleShowGcashQr() {
+            if (cart.length === 0) {
+                showToast('Add items before showing the GCash QR', 'warning');
+                return;
+            }
+
+            if (!gcashOrderNumber) {
+                gcashOrderNumber = generateGcashOrderNumber();
+            }
+
+            const totalAmount = getCartTotal();
+            gcashPaymentConfirmed = false;
+
+            gcashOrderNumberEl.textContent = gcashOrderNumber;
+            gcashAmountEl.textContent = formatCurrency(totalAmount);
+            gcashReferenceInput.value = gcashReferenceValue;
+            gcashModal.classList.add('active');
+            updateGcashStatus();
+        }
+
+        function closeGcashModal() {
+            gcashModal.classList.remove('active');
+        }
+
+        function handleGcashPaymentReceived() {
+            gcashPaymentConfirmed = true;
+            gcashReferenceValue = gcashReferenceInput.value.trim();
+            closeGcashModal();
+            updateGcashStatus();
+            updateCheckoutButtonState();
+            showToast('GCash payment marked as received', 'success');
+        }
+
+        function closeQuantityModal() {
+            quantityModal.classList.remove('active');
+            selectedProductId = null;
+            quantityInput.value = 1;
+        }
+
+        window.openQuantityModal = (productId) => {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            selectedProductId = productId;
+            quantityProductName.textContent = product.name;
+            quantityProductPrice.textContent = formatCurrency(product.price);
+            quantityStockHint.textContent = `Stock available: ${product.stock}`;
+            quantityInput.value = 1;
+            quantityInput.max = product.stock;
+            quantityModal.classList.add('active');
+            setTimeout(() => quantityInput.focus(), 50);
+        };
+
+        function handleQuantityConfirm() {
+            if (!selectedProductId) {
+                closeQuantityModal();
+                return;
+            }
+
+            const product = allProducts.find(p => p.id === selectedProductId);
+            if (!product) {
+                closeQuantityModal();
+                return;
+            }
+
+            const qty = parseInt(quantityInput.value, 10);
+            if (!Number.isFinite(qty) || qty <= 0) {
+                showToast('Enter a valid quantity', 'warning');
+                return;
+            }
+
+            if (qty > product.stock) {
+                showToast('Cannot exceed available stock', 'warning');
+                return;
+            }
+
+            window.addToCart(selectedProductId, qty);
+            closeQuantityModal();
+        }
+
+        function adjustQuantity(delta) {
+            if (!selectedProductId) return;
+            const product = allProducts.find(p => p.id === selectedProductId);
+            if (!product) return;
+
+            const currentValue = parseInt(quantityInput.value, 10) || 1;
+            let nextValue = currentValue + delta;
+            if (nextValue < 1) nextValue = 1;
+            if (nextValue > product.stock) nextValue = product.stock;
+            quantityInput.value = nextValue;
+        }
+
+        function generateGcashOrderNumber() {
+            const random = Math.floor(Math.random() * 90) + 10;
+            return `ORD-${Date.now()}-${random}`;
+        }
+
+        function determinePaymentStatus() {
+            if (selectedPaymentMethod === PAYMENT_METHODS.GCASH) {
+                return gcashPaymentConfirmed ? PAYMENT_STATUS.PAID : PAYMENT_STATUS.AWAITING;
+            }
+
+            if (selectedPaymentMethod === PAYMENT_METHODS.CARD) {
+                return PAYMENT_STATUS.PENDING;
+            }
+
+            return PAYMENT_STATUS.PAID;
+        }
+
+        function formatPaymentMethodLabel(method) {
+            switch (method) {
+                case PAYMENT_METHODS.GCASH:
+                    return 'GCash QR';
+                case PAYMENT_METHODS.CARD:
+                    return 'Card';
+                default:
+                    return 'Cash';
+            }
+        }
+
+        function formatPaymentStatusLabel(status) {
+            switch (status) {
+                case PAYMENT_STATUS.PAID:
+                    return 'Paid';
+                case PAYMENT_STATUS.AWAITING:
+                    return 'Awaiting Payment';
+                case PAYMENT_STATUS.PENDING:
+                    return 'Pending';
+                case PAYMENT_STATUS.FAILED:
+                    return 'Failed';
+                case PAYMENT_STATUS.REFUNDED:
+                    return 'Refunded';
+                default:
+                    return status || 'Unknown';
+            }
+        }
 
         // Load products
         async function loadProducts() {
@@ -200,7 +597,7 @@
             }
 
             grid.innerHTML = filtered.map(product => `
-                <div class="product-card" onclick="window.addToCart(${product.id})">
+                <div class="product-card" onclick="window.openQuantityModal(${product.id})">
                     <img src="${product.image_path || 'https://via.placeholder.com/150'}" 
                          alt="${product.name}"
                          onerror="this.src='https://via.placeholder.com/150'">
@@ -214,35 +611,45 @@
         }
 
         // Add to cart
-        window.addToCart = (productId) => {
+        window.addToCart = (productId, quantity = 1) => {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
 
+            const qty = parseInt(quantity, 10);
+            if (!Number.isFinite(qty) || qty <= 0) {
+                showToast('Enter a valid quantity', 'warning');
+                return;
+            }
+
             const cartItem = cart.find(item => item.product_id === productId);
+            const newQuantityTotal = cartItem ? cartItem.quantity + qty : qty;
+
+            if (newQuantityTotal > product.stock) {
+                showToast('Cannot add more than available stock', 'warning');
+                return;
+            }
 
             if (cartItem) {
-                if (cartItem.quantity >= product.stock) {
-                    showToast('Cannot add more than available stock', 'warning');
-                    return;
-                }
-                cartItem.quantity++;
+                cartItem.quantity += qty;
             } else {
                 cart.push({
                     product_id: productId,
                     product_name: product.name,
                     unit_price: product.price,
-                    quantity: 1,
+                    quantity: qty,
                     stock: product.stock
                 });
             }
 
+            invalidateGcashPayment();
             renderCart();
-            showToast(`${product.name} added to cart`, 'success', 1000);
+            showToast(`${qty} x ${product.name} added to cart`, 'success', 1000);
         };
 
         // Remove from cart
         window.removeFromCart = (productId) => {
             cart = cart.filter(item => item.product_id !== productId);
+            invalidateGcashPayment();
             renderCart();
         };
 
@@ -260,13 +667,13 @@
                 showToast('Cannot exceed available stock', 'warning');
             }
 
+            invalidateGcashPayment();
             renderCart();
         };
 
         // Render cart
         function renderCart() {
             const cartContainer = document.getElementById('cartItems');
-            const checkoutBtn = document.getElementById('checkoutBtn');
 
             if (cart.length === 0) {
                 cartContainer.innerHTML = `
@@ -275,8 +682,9 @@
                         <p class="subtitle">Add items from the menu</p>
                     </div>
                 `;
-                checkoutBtn.disabled = true;
                 updateTotal();
+                updateCheckoutButtonState();
+                updateGcashStatus();
                 return;
             }
 
@@ -298,13 +706,14 @@
                 </div>
             `).join('');
 
-            checkoutBtn.disabled = false;
             updateTotal();
+            updateCheckoutButtonState();
+            updateGcashStatus();
         }
 
         // Update total
         function updateTotal() {
-            const total = cart.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+            const total = getCartTotal();
             document.getElementById('subtotal').textContent = formatCurrency(total);
             document.getElementById('total').textContent = formatCurrency(total);
         }
@@ -314,17 +723,25 @@
             if (cart.length === 0) return;
             cart = [];
             renderCart();
+            resetGcashState();
+            updateGcashStatus();
+            updateCheckoutButtonState();
             showToast('Cart cleared', 'info');
         });
 
         // Checkout
-        document.getElementById('checkoutBtn').addEventListener('click', async () => {
+        checkoutBtn.addEventListener('click', async () => {
             if (cart.length === 0) {
                 showToast('Cart is empty', 'warning');
                 return;
             }
 
-            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (selectedPaymentMethod === PAYMENT_METHODS.GCASH && !gcashPaymentConfirmed) {
+                showToast('Confirm the GCash payment before completing the order.', 'warning');
+                updateCheckoutButtonState();
+                return;
+            }
+
             checkoutBtn.disabled = true;
             checkoutBtn.textContent = 'Processing...';
 
@@ -332,8 +749,15 @@
                 const orderData = {
                     customer_name: document.getElementById('customerName').value || null,
                     customer_phone: document.getElementById('customerPhone').value || null,
-                    items: cart
+                    items: cart,
+                    payment_method: selectedPaymentMethod,
+                    payment_status: determinePaymentStatus(),
+                    payment_reference: selectedPaymentMethod === PAYMENT_METHODS.GCASH ? (gcashReferenceValue || null) : null
                 };
+
+                if (selectedPaymentMethod === PAYMENT_METHODS.GCASH && gcashOrderNumber) {
+                    orderData.order_number = gcashOrderNumber;
+                }
 
                 const result = await createOrder(orderData);
 
@@ -352,6 +776,8 @@
                 document.getElementById('customerName').value = '';
                 document.getElementById('customerPhone').value = '';
                 renderCart();
+                resetGcashState();
+                updateGcashStatus();
 
                 showToast('Order completed successfully!', 'success');
             } catch (error) {
@@ -359,7 +785,7 @@
                 showToast('Failed to complete order', 'error');
             } finally {
                 checkoutBtn.disabled = false;
-                checkoutBtn.textContent = 'Checkout';
+                updateCheckoutButtonState();
             }
         });
 
@@ -385,6 +811,11 @@
             `).join('');
 
             document.getElementById('receiptTotal').textContent = formatCurrency(order.total_amount);
+            document.getElementById('receiptPaymentMethod').textContent = formatPaymentMethodLabel(order.payment_method);
+            document.getElementById('receiptPaymentStatus').textContent = formatPaymentStatusLabel(order.payment_status);
+            document.getElementById('receiptPaymentReference').innerHTML = order.payment_reference
+                ? `Reference: <strong>${order.payment_reference}</strong>`
+                : 'Reference: <span class="muted">Not recorded</span>';
 
             document.getElementById('receiptModal').classList.add('active');
         }
@@ -397,6 +828,9 @@
         // New order
         document.getElementById('newOrderBtn').addEventListener('click', () => {
             document.getElementById('receiptModal').classList.remove('active');
+             resetGcashState();
+             updateGcashStatus();
+             updateCheckoutButtonState();
             loadProducts(); // Reload to update stock
         });
 

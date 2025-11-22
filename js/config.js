@@ -34,6 +34,22 @@ export const ORDER_STATUS = {
   CANCELLED: 'cancelled'
 };
 
+// Payment Methods
+export const PAYMENT_METHODS = {
+  CASH: 'cash',
+  CARD: 'card',
+  GCASH: 'gcash'
+};
+
+// Payment Status
+export const PAYMENT_STATUS = {
+  PENDING: 'pending',
+  AWAITING: 'awaiting_payment',
+  PAID: 'paid',
+  FAILED: 'failed',
+  REFUNDED: 'refunded'
+};
+
 // Product Status
 export const PRODUCT_STATUS = {
   ACTIVE: 'active',
@@ -52,5 +68,13 @@ export const STOCK_CHANGE_TYPES = {
   INCREASE: 'increase',
   DECREASE: 'decrease',
   SET: 'set'
+};
+
+// GCash Settings
+export const GCASH_CONFIG = {
+  accountName: import.meta.env.VITE_GCASH_ACCOUNT_NAME || 'ABC Bakery GCash',
+  accountNumber: import.meta.env.VITE_GCASH_ACCOUNT_NUMBER || '09170000000',
+  message: import.meta.env.VITE_GCASH_MESSAGE || 'Scan to pay via GCash',
+  defaultReferencePrefix: import.meta.env.VITE_GCASH_REFERENCE_PREFIX || 'GCASH-QR'
 };
 

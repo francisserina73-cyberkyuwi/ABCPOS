@@ -41,12 +41,18 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_phone VARCHAR(20),
     total_amount DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+    payment_method ENUM('cash', 'card', 'gcash') DEFAULT 'cash',
+    payment_status ENUM('pending', 'awaiting_payment', 'paid', 'failed', 'refunded') DEFAULT 'pending',
+    payment_reference VARCHAR(100),
+    payment_qr_payload TEXT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP NULL,
     created_by INT,
     FOREIGN KEY (created_by) REFERENCES users(id),
     INDEX idx_order_date (order_date),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_payment_method (payment_method),
+    INDEX idx_payment_status (payment_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Order Items Table

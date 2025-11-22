@@ -62,6 +62,10 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_phone TEXT,
     total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+    payment_method TEXT NOT NULL DEFAULT 'cash' CHECK (payment_method IN ('cash', 'card', 'gcash')),
+    payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'awaiting_payment', 'paid', 'failed', 'refunded')),
+    payment_reference TEXT,
+    payment_qr_payload TEXT,
     order_date TIMESTAMPTZ DEFAULT NOW(),
     completed_at TIMESTAMPTZ,
     created_by UUID REFERENCES user_profiles(id),
@@ -73,6 +77,8 @@ CREATE INDEX IF NOT EXISTS idx_orders_order_date ON orders(order_date);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_by ON orders(created_by);
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_method ON orders(payment_method);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
 
 -- =====================================================
 -- ORDER ITEMS TABLE

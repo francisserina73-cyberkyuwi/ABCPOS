@@ -294,7 +294,9 @@ export async function createOrder(orderData) {
     const { user } = await getCurrentUser();
     
     // Generate order number
-    const orderNumber = `ORD-${Date.now()}`;
+    const orderNumber = orderData.order_number || `ORD-${Date.now()}`;
+    const paymentMethod = orderData.payment_method || 'cash';
+    const paymentStatus = orderData.payment_status || (paymentMethod === 'cash' ? 'paid' : 'pending');
     
     // Calculate total
     const totalAmount = orderData.items.reduce((sum, item) => 
@@ -310,6 +312,10 @@ export async function createOrder(orderData) {
         customer_phone: orderData.customer_phone || null,
         total_amount: totalAmount,
         status: 'pending',
+        payment_method: paymentMethod,
+        payment_status: paymentStatus,
+        payment_reference: orderData.payment_reference || null,
+        payment_qr_payload: orderData.payment_qr_payload || null,
         created_by: user?.id
       }])
       .select()
