@@ -724,21 +724,29 @@
             }
 
             cartContainer.innerHTML = cart.map(item => `
-                <div class="cart-item">
+                <div class="cart-item" data-product-id="${item.product_id}">
                     <div class="item-info">
                         <h4>${item.product_name}</h4>
-                        <p>${formatCurrency(item.unit_price)}</p>
+                        <p class="item-price">${formatCurrency(item.unit_price)} each</p>
+                        <p class="item-stock-hint">Stock: ${item.stock}</p>
                     </div>
                     <div class="item-controls">
-                        <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, -1)">-</button>
-                        <input type="number" class="qty-input" value="${item.quantity}" min="1" max="${item.stock}" 
-                               onchange="window.setQuantity(${item.product_id}, this.value)" 
-                               onblur="window.validateQuantity(${item.product_id}, this)">
-                        <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, 1)">+</button>
-                        <button class="remove-btn" onclick="window.removeFromCart(${item.product_id})">🗑️</button>
+                        <div class="qty-control-group">
+                            <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, -1)" title="Decrease quantity">-</button>
+                            <input type="number" class="qty-input" value="${item.quantity}" min="1" max="${item.stock}" 
+                                   onchange="window.setQuantity(${item.product_id}, this.value)" 
+                                   onblur="window.validateQuantity(${item.product_id}, this)"
+                                   title="Edit quantity directly">
+                            <button class="qty-btn" onclick="window.updateQuantity(${item.product_id}, 1)" title="Increase quantity">+</button>
+                        </div>
+                        <button class="remove-btn" onclick="window.removeFromCart(${item.product_id})" title="Remove item from cart">
+                            <span class="remove-icon">🗑️</span>
+                            <span class="remove-text">Remove</span>
+                        </button>
                     </div>
                     <div class="item-subtotal">
-                        ${formatCurrency(item.unit_price * item.quantity)}
+                        <span class="subtotal-label">Subtotal:</span>
+                        <span class="subtotal-amount">${formatCurrency(item.unit_price * item.quantity)}</span>
                     </div>
                 </div>
             `).join('');
