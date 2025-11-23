@@ -301,6 +301,17 @@
                 .join(' ');
         }
 
+        function getItemCount(order) {
+            if (!order?.order_items?.length) {
+                return 0;
+            }
+
+            return order.order_items.reduce((sum, item) => {
+                const quantity = Number(item?.quantity) || 0;
+                return sum + quantity;
+            }, 0);
+        }
+
         // Render reports
         function renderReports(orders) {
             // Calculate stats
@@ -308,7 +319,7 @@
             const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
             const avgOrder = totalOrders > 0 ? totalSales / totalOrders : 0;
             const totalItems = orders.reduce((sum, order) => {
-                return sum + (order.order_items?.length || 0);
+                return sum + getItemCount(order);
             }, 0);
 
             // Update stats
@@ -330,7 +341,7 @@
                     <td><strong>${order.order_number}</strong></td>
                     <td>${formatDate(order.order_date, 'datetime')}</td>
                     <td>${order.customer_name || 'Walk-in'}</td>
-                    <td>${order.order_items?.length || 0}</td>
+                    <td>${getItemCount(order)}</td>
                     <td>${formatCurrency(order.total_amount)}</td>
                     <td>
                         <span class="status-badge status-${order.status}">
@@ -358,7 +369,7 @@
                 'Date': formatDate(order.order_date, 'datetime'),
                 'Customer': order.customer_name || 'Walk-in',
                 'Phone': order.customer_phone || '-',
-                'Items': order.order_items?.length || 0,
+                'Items': getItemCount(order),
                 'Total Amount': order.total_amount,
                 'Order Status': order.status,
                 'Payment Status': order.payment_status
