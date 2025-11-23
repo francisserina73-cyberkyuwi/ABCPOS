@@ -25,7 +25,10 @@ Create `.env` file:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_SITE_URL=https://your-app.vercel.app
 ```
+
+`VITE_SITE_URL` should match the domain where the app is deployed (e.g., your Vercel URL) so that Supabase password-reset emails never fall back to `http://localhost`.
 
 Install and run:
 ```bash

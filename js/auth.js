@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase-client.js';
-import { ROLES } from './config.js';
+import { ROLES, APP_BASE_URL } from './config.js';
 
 /**
  * Sign in with email and password
@@ -109,7 +109,7 @@ export async function signOut() {
 export async function requestPasswordReset(email) {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password.html`
+      redirectTo: `${APP_BASE_URL}/reset-password.html`
     });
 
     if (error) {

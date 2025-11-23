@@ -109,10 +109,12 @@
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key-here
+VITE_SITE_URL=https://your-app.vercel.app
 ```
 
 **⚠️ IMPORTANT:** 
 - Replace the values with YOUR Supabase credentials from Step 1.6
+- Set `VITE_SITE_URL` to your deployed domain (Vercel URL) so Supabase password reset links never point to `http://localhost`
 - Never commit this file to Git (it's in `.gitignore`)
 
 #### Step 2.2: Install Dependencies

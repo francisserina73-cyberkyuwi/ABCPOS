@@ -12,6 +12,11 @@ export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR
 export const APP_NAME = 'ABC POS System';
 export const APP_VERSION = '2.0.0';
 
+const defaultAppUrl =
+  (typeof window !== 'undefined' && window.location.origin) || 'http://localhost:5173';
+
+export const APP_BASE_URL = import.meta.env.VITE_SITE_URL || defaultAppUrl;
+
 // Storage Configuration
 export const STORAGE_BUCKET = 'product-images';
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
