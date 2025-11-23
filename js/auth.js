@@ -102,6 +102,50 @@ export async function signOut() {
 }
 
 /**
+ * Request password reset email
+ * @param {string} email
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function requestPasswordReset(email) {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password.html`
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Password reset request error:', error);
+    return { success: false, error: 'Failed to request password reset.' };
+  }
+}
+
+/**
+ * Update password for current session (password recovery flow)
+ * @param {string} newPassword
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function updatePassword(newPassword) {
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user };
+  } catch (error) {
+    console.error('Update password error:', error);
+    return { success: false, error: 'Failed to update password.' };
+  }
+}
+
+/**
  * Get current user session
  * @returns {Promise<{user: object, session: object}>}
  */

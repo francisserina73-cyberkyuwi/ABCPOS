@@ -41,6 +41,10 @@
                     </div>
                 </div>
 
+                <div class="form-links">
+                    <button type="button" class="link-button" id="forgotPasswordLink">Forgot password?</button>
+                </div>
+
                 <button type="submit" id="loginBtn">Continue</button>
             </form>
 
@@ -50,9 +54,23 @@
         </div>
     </div>
 
+    <div class="reset-modal" id="resetModal" aria-hidden="true">
+        <div class="reset-modal__content" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+            <button class="reset-modal__close" id="closeResetModal" aria-label="Close password reset form">&times;</button>
+            <h3 id="resetTitle">Reset your password</h3>
+            <p class="reset-modal__text">Enter your email address and we'll send you a reset link.</p>
+            <form id="resetForm">
+                <label for="resetEmail">Email address</label>
+                <input type="email" id="resetEmail" placeholder="you@example.com" required>
+                <button type="submit" id="resetSubmitBtn">Send reset link</button>
+            </form>
+            <p class="reset-modal__note" id="resetFeedback"></p>
+        </div>
+    </div>
+
     <script type="module">
-        import { signIn, isAuthenticated } from './js/auth.js';
-        import { showToast, showLoading, hideLoading } from './js/utils.js';
+        import { signIn, isAuthenticated, requestPasswordReset } from './js/auth.js';
+        import { showToast, showLoading, hideLoading, validateEmail } from './js/utils.js';
 
         // Check if already logged in
         async function checkAuth() {
@@ -153,6 +171,68 @@
             const color = type === 'error' ? '#ff4444' : '#10b981';
             messageDiv.innerHTML = `<p style="color: ${color};">${message}</p>`;
         }
+
+        // Forgot password modal logic
+        const resetModal = document.getElementById('resetModal');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const closeResetModal = document.getElementById('closeResetModal');
+        const resetForm = document.getElementById('resetForm');
+        const resetEmailInput = document.getElementById('resetEmail');
+        const resetFeedback = document.getElementById('resetFeedback');
+        const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+
+        function openResetModal() {
+            resetFeedback.textContent = '';
+            resetFeedback.className = 'reset-modal__note';
+            resetEmailInput.value = document.getElementById('email').value.trim();
+            resetModal.classList.add('active');
+            resetModal.setAttribute('aria-hidden', 'false');
+            resetEmailInput.focus();
+        }
+
+        function closeReset() {
+            resetModal.classList.remove('active');
+            resetModal.setAttribute('aria-hidden', 'true');
+        }
+
+        forgotPasswordLink.addEventListener('click', openResetModal);
+        closeResetModal.addEventListener('click', closeReset);
+        resetModal.addEventListener('click', (event) => {
+            if (event.target === resetModal) {
+                closeReset();
+            }
+        });
+
+        resetForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = resetEmailInput.value.trim();
+
+            if (!email || !validateEmail(email)) {
+                resetFeedback.textContent = 'Please enter a valid email address.';
+                resetFeedback.classList.add('error');
+                return;
+            }
+
+            resetSubmitBtn.disabled = true;
+            resetSubmitBtn.textContent = 'Sending...';
+            resetFeedback.textContent = '';
+            resetFeedback.className = 'reset-modal__note';
+
+            const { success, error } = await requestPasswordReset(email);
+
+            if (success) {
+                resetFeedback.textContent = 'Reset link sent! Please check your inbox.';
+                resetFeedback.classList.add('success');
+                showToast('Reset link sent! Please check your inbox.', 'success');
+                setTimeout(closeReset, 1800);
+            } else {
+                resetFeedback.textContent = error || 'Failed to send reset link.';
+                resetFeedback.classList.add('error');
+            }
+
+            resetSubmitBtn.disabled = false;
+            resetSubmitBtn.textContent = 'Send reset link';
+        });
     </script>
 </body>
 </html>

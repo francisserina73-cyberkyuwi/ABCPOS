@@ -343,6 +343,25 @@ body {
   color: #1d4ed8;
 }
 
+.form-links {
+  text-align: right;
+  margin-top: -6px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
 .login-form button {
   border: none;
   border-radius: 14px;
@@ -381,6 +400,120 @@ body {
   color: #64748b;
   font-size: 14px;
   text-align: center;
+}
+
+.reset-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.reset-modal.active {
+  display: flex;
+}
+
+.reset-modal__content {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  width: min(420px, 100%);
+  position: relative;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reset-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #475569;
+}
+
+.reset-modal__text {
+  color: #475569;
+  font-size: 14px;
+}
+
+.reset-modal__content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reset-modal__content label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.reset-modal__content input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+  background: #f8fafc;
+}
+
+.reset-modal__content button {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reset-modal__note {
+  min-height: 18px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.reset-modal__note.error {
+  color: #dc2626;
+}
+
+.reset-modal__note.success {
+  color: #059669;
+}
+
+.reset-alert {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  background: #eef2ff;
+  color: #1d4ed8;
+}
+
+.reset-alert.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.reset-alert.success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.back-to-login {
+  margin-top: -8px;
+}
+
+.hidden {
+  display: none !important;
 }
 
 @media (max-width: 600px) {
