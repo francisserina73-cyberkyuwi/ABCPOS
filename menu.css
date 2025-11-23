@@ -682,3 +682,135 @@ form {
 ::-webkit-scrollbar-thumb:hover {
     background: #3b82f6;
 }
+
+/* =====================================================
+   Dark Mode
+===================================================== */
+
+body.dark-mode {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+body.dark-mode .sidebar {
+    background-color: #111827;
+    border-color: #1f2937;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .sidebar-header h1,
+body.dark-mode .nav-link,
+body.dark-mode .logout-btn {
+    color: #e2e8f0;
+}
+
+body.dark-mode .nav-link {
+    color: #94a3b8;
+}
+
+body.dark-mode .nav-link.active {
+    background-color: #2563eb;
+    color: #e0f2fe;
+}
+
+body.dark-mode .nav-link:hover:not(.active) {
+    background-color: #1f2937;
+    color: #f8fafc;
+}
+
+body.dark-mode .logout-btn {
+    color: #f87171;
+}
+
+body.dark-mode .logout-btn:hover {
+    background-color: #7f1d1d;
+    color: #fecaca;
+}
+
+body.dark-mode .logout-icon {
+    background-color: #f87171;
+}
+
+body.dark-mode .main-content {
+    background-color: #0f172a;
+}
+
+body.dark-mode .content-header h2,
+body.dark-mode .table-header h3 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .filter-tab,
+body.dark-mode .btn-add-menu,
+body.dark-mode .table-wrapper,
+body.dark-mode .products-table,
+body.dark-mode .modal-content {
+    background-color: #1f2937;
+    color: #e2e8f0;
+    border-color: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .filter-tab {
+    border-color: #334155;
+    color: #cbd5f5;
+}
+
+body.dark-mode .filter-tab.active {
+    background-color: #2563eb;
+    color: #e0f2fe;
+    border-color: #2563eb;
+}
+
+body.dark-mode .products-table thead {
+    background-color: #111827;
+}
+
+body.dark-mode .products-table th {
+    color: #94a3b8;
+    border-bottom-color: #1f2937;
+}
+
+body.dark-mode .products-table td {
+    color: #e2e8f0;
+    border-bottom-color: #1f2937;
+}
+
+body.dark-mode .product-image {
+    background-color: #0f172a;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea,
+body.dark-mode .form-group select,
+body.dark-mode .search-box input {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+body.dark-mode .form-group label,
+body.dark-mode .product-name,
+body.dark-mode .product-description {
+    color: #e2e8f0;
+}
+
+body.dark-mode .action-btn {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .btn-primary,
+body.dark-mode .btn-add-menu {
+    background-color: #2563eb;
+    color: #f8fafc;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: #1f2937;
+    color: #f8fafc;
+    border-color: #334155;
+}

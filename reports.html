@@ -18,14 +18,14 @@
         }
 
         .date-filters input,
-        .date-filters button:not(.theme-toggle) {
+        .date-filters button {
             padding: 10px 15px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
         }
 
-        .date-filters button:not(.theme-toggle) {
+        .date-filters button {
             background-color: #3b82f6;
             color: white;
             border: none;
@@ -33,19 +33,8 @@
             transition: background-color 0.3s;
         }
 
-        .date-filters button:not(.theme-toggle):hover {
+        .date-filters button:hover {
             background-color: #2563eb;
-        }
-
-        .date-filters .theme-toggle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            padding: 0;
         }
 
         .stats-overview {
@@ -188,15 +177,13 @@
             border-color: #334155;
         }
 
-        body.dark-mode .date-filters button:not(.theme-toggle) {
+        body.dark-mode .date-filters button {
             background-color: #2563eb;
             color: #f8fafc;
         }
-
         body.dark-mode .export-btn {
             background-color: #059669;
         }
-
         body.dark-mode .empty-state {
             color: #94a3b8;
         }
@@ -258,7 +245,6 @@
                 <input type="date" id="endDate">
                 <button onclick="window.loadReports()">Generate Report</button>
                 <button class="export-btn" onclick="window.exportReport()">📊 Export CSV</button>
-                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
             </div>
 
             <!-- Stats Overview -->
@@ -309,13 +295,10 @@
     <script type="module">
         import { requireAuth, getCurrentUser, signOut } from './js/auth.js';
         import { getOrders } from './js/api.js';
-        import { formatCurrency, formatDate, showToast, exportToCSV, initThemeToggle } from './js/utils.js';
+        import { formatCurrency, formatDate, showToast, exportToCSV } from './js/utils.js';
 
         // Protect page
         await requireAuth();
-
-        const themeToggleButton = document.getElementById('themeToggle');
-        initThemeToggle(themeToggleButton);
 
         let currentOrders = [];
 

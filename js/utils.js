@@ -506,3 +506,8 @@ export function initThemeToggle(toggleElement) {
   });
 }
 
+// Apply stored theme immediately on load when utils is imported
+if (typeof document !== 'undefined') {
+  applyTheme(getStoredTheme());
+}
+
