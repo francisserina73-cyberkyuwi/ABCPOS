@@ -5,6 +5,7 @@
 
 import { supabase } from './supabase-client.js';
 import { getCurrentUser } from './auth.js';
+import { PAYMENT_STATUS } from './config.js';
 
 // =====================================================
 // PRODUCTS API
@@ -303,6 +304,9 @@ export async function createOrder(orderData) {
       sum + (item.quantity * item.unit_price), 0
     );
 
+    const paymentStatus = orderData.payment_status;
+    const orderStatus = paymentStatus === PAYMENT_STATUS.PAID ? 'completed' : 'pending';
+
     // Create order
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -311,12 +315,13 @@ export async function createOrder(orderData) {
         customer_name: orderData.customer_name || null,
         customer_phone: orderData.customer_phone || null,
         total_amount: totalAmount,
-        status: 'pending',
+        status: orderStatus,
         payment_method: paymentMethod,
         payment_status: paymentStatus,
         payment_reference: orderData.payment_reference || null,
         payment_qr_payload: orderData.payment_qr_payload || null,
-        created_by: user?.id
+        created_by: user?.id,
+        completed_at: orderStatus === 'completed' ? new Date().toISOString() : null
       }])
       .select()
       .single();
