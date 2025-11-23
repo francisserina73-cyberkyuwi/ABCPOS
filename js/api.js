@@ -297,14 +297,15 @@ export async function createOrder(orderData) {
     // Generate order number
     const orderNumber = orderData.order_number || `ORD-${Date.now()}`;
     const paymentMethod = orderData.payment_method || 'cash';
-    const paymentStatus = orderData.payment_status || (paymentMethod === 'cash' ? 'paid' : 'pending');
+    const paymentStatus =
+      orderData.payment_status ||
+      (paymentMethod === 'cash' ? PAYMENT_STATUS.PAID : PAYMENT_STATUS.PENDING);
     
     // Calculate total
     const totalAmount = orderData.items.reduce((sum, item) => 
       sum + (item.quantity * item.unit_price), 0
     );
 
-    const paymentStatus = orderData.payment_status;
     const orderStatus = paymentStatus === PAYMENT_STATUS.PAID ? 'completed' : 'pending';
 
     // Create order
