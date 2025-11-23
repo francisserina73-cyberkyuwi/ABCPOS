@@ -250,36 +250,33 @@
 
         let currentOrders = [];
 
-        // Set default dates (last 30 days)
-        function setDefaultDates() {
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
-
-            document.getElementById('startDate').valueAsDate = startDate;
-            document.getElementById('endDate').valueAsDate = endDate;
+        // Clear date filters so all orders are loaded
+        function resetDateFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
         }
 
         // Load reports
         window.loadReports = async () => {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
 
-            if (!startDate || !endDate) {
-                showToast('Please select start and end dates', 'warning');
+            if ((startDateInput && !endDateInput) || (!startDateInput && endDateInput)) {
+                showToast('Please select both start and end dates', 'warning');
                 return;
             }
 
-            if (new Date(startDate) > new Date(endDate)) {
+            if (startDateInput && endDateInput && new Date(startDateInput) > new Date(endDateInput)) {
                 showToast('Start date must be before end date', 'warning');
                 return;
             }
 
-            // Add time to make it inclusive
-            const filters = {
-                startDate: startDate + 'T00:00:00',
-                endDate: endDate + 'T23:59:59'
-            };
+            const filters = {};
+
+            if (startDateInput && endDateInput) {
+                filters.startDate = startDateInput + 'T00:00:00';
+                filters.endDate = endDateInput + 'T23:59:59';
+            }
 
             const { data, error } = await getOrders(filters);
 
@@ -401,7 +398,7 @@
 
         // Initialize
         checkInventoryAccess();
-        setDefaultDates();
+        resetDateFilters();
         loadReports();
     </script>
 </body>
