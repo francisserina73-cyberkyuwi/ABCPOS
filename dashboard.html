@@ -61,6 +61,9 @@
                     <p>Welcome back, <span id="userName">User</span>!</p>
                 </div>
             </div>
+            <div class="header-right">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
         </div>
 
         <!-- Stats Cards -->
@@ -126,10 +129,13 @@
         import { requireAuth, getCurrentUser, signOut } from './js/auth.js';
         import { getDashboardStats, getProducts } from './js/api.js';
         import { supabase } from './js/supabase-client.js';
-        import { formatCurrency, showToast } from './js/utils.js';
+        import { formatCurrency, showToast, initThemeToggle } from './js/utils.js';
 
         // Protect page - require authentication
         await requireAuth();
+
+        // Initialize theme toggle
+        initThemeToggle(document.getElementById('themeToggle'));
 
         // Get current user
         const { user } = await getCurrentUser();
