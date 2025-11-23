@@ -449,3 +449,60 @@ export function printElement(elementId) {
   printWindow.print();
 }
 
+// =====================================================
+// THEME UTILITIES
+// =====================================================
+
+const THEME_STORAGE_KEY = 'pos_theme_preference';
+
+/**
+ * Retrieve stored theme preference
+ * @returns {'light'|'dark'}
+ */
+export function getStoredTheme() {
+  if (typeof window === 'undefined') return 'light';
+  return localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+}
+
+/**
+ * Apply theme class to document body
+ * @param {'light'|'dark'} theme
+ * @returns {'light'|'dark'}
+ */
+export function applyTheme(theme = 'light') {
+  if (typeof document === 'undefined') return 'light';
+  const normalized = theme === 'dark' ? 'dark' : 'light';
+  document.body.classList.toggle('dark-mode', normalized === 'dark');
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(THEME_STORAGE_KEY, normalized);
+  }
+  return normalized;
+}
+
+/**
+ * Initialize a theme toggle button
+ * @param {HTMLElement|null} toggleElement
+ */
+export function initThemeToggle(toggleElement) {
+  const setToggleLabel = (currentTheme) => {
+    if (!toggleElement) return;
+    const isDark = currentTheme === 'dark';
+    toggleElement.textContent = isDark ? '☀️' : '🌙';
+    toggleElement.setAttribute(
+      'aria-label',
+      isDark ? 'Switch to light mode' : 'Switch to dark mode'
+    );
+  };
+
+  const initialTheme = applyTheme(getStoredTheme());
+  setToggleLabel(initialTheme);
+
+  if (!toggleElement) return;
+
+  toggleElement.addEventListener('click', () => {
+    const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+    const appliedTheme = applyTheme(nextTheme);
+    setToggleLabel(appliedTheme);
+  });
+}
+
